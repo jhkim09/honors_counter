@@ -26,7 +26,21 @@ def evaluate_contracts(df):
 
         return "X"
 
+    # 판정 수행
     df["평가대상여부"] = df.apply(evaluate, axis=1)
+
+    # O/X 카운트 추가
+    o_count = (df["평가대상여부"] == "O").sum()
+    x_count = (df["평가대상여부"] == "X").sum()
+
+    # 총계 행 추가
+    count_row = pd.DataFrame([{
+        "상태": "총계",
+        "O건수": o_count,
+        "X건수": x_count
+    }])
+    df = pd.concat([df, count_row], ignore_index=True)
+
     return df
 
 @app.route("/evaluate", methods=["POST"])
@@ -43,13 +57,10 @@ def evaluate():
         output_path = os.path.join(tmpdir, "evaluated_" + file.filename)
         file.save(input_path)
 
+        # 판정 및 파일 저장
         df = pd.read_excel(input_path)
         df_result = evaluate_contracts(df)
         df_result.to_excel(output_path, index=False)
-
-        # 결과 파일을 바이너리로 읽은 뒤 메모리에서 전송하고 즉시 삭제
-        with open(output_path, "rb") as f:
-            data = f.read()
 
         return send_file(
             path_or_file=output_path,
