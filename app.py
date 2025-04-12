@@ -47,7 +47,12 @@ def evaluate():
         df_result = evaluate_contracts(df)
         df_result.to_excel(output_path, index=False)
 
-        return send_file(output_path, as_attachment=True)
+        # 결과 파일을 바이너리로 읽은 뒤 메모리에서 전송하고 즉시 삭제
+        with open(output_path, "rb") as f:
+            data = f.read()
 
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+        return send_file(
+            path_or_file=output_path,
+            as_attachment=True,
+            download_name=os.path.basename(output_path),
+            mim
