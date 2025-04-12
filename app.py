@@ -55,4 +55,8 @@ def evaluate():
             path_or_file=output_path,
             as_attachment=True,
             download_name=os.path.basename(output_path),
-            mim
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
